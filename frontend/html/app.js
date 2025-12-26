@@ -122,9 +122,6 @@ async function addField() {
     return;
   }
 
-  const position =
-    document.querySelectorAll("#fields div").length + 1;
-
   await fetch(`${API}/forms/${currentFormId}/fields`, {
     method: "POST",
     headers: {
@@ -135,7 +132,6 @@ async function addField() {
       type,
       label,
       required,
-      position
     })
   });
 

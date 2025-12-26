@@ -3,6 +3,17 @@ import { getSupabaseAdmin } from "../db/supabase.js";
 export async function addFieldToForm(formId, field) {
   const supabase = getSupabaseAdmin();
 
+  // Obtener la última posición usada
+  const { data: lastField } = await supabase
+    .from("form_fields")
+    .select("position")
+    .eq("form_id", formId)
+    .order("position", { ascending: false })
+    .limit(1)
+    .single();
+
+  const nextPosition = lastField ? lastField.position + 1 : 1;
+
   const { data, error } = await supabase
     .from("form_fields")
     .insert({
@@ -11,7 +22,7 @@ export async function addFieldToForm(formId, field) {
       label: field.label,
       required: !!field.required,
       options: field.options || null,
-      position: field.position
+      position: nextPosition
     })
     .select()
     .single();
