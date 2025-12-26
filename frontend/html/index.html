@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Saas-Formularios · Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+<h2>Login por WhatsApp</h2>
+
+<div id="step-phone">
+  <input id="whatsapp" placeholder="+521..." />
+  <button onclick="requestOTP()">Enviar código</button>
+</div>
+
+<div id="step-otp" style="display:none;">
+  <input id="otp" placeholder="Código OTP" />
+  <button onclick="verifyOTP()">Entrar</button>
+</div>
+
+<script src="auth.js"></script>
+</body>
+</html>
+

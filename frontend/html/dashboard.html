@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Saas-Formularios · Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+<h2>Dashboard</h2>
+
+<div id="account"></div>
+<button onclick="logout()">Cerrar sesión</button>
+
+<hr>
+
+<h3>Crear formulario</h3>
+<input id="form-name" placeholder="Nombre del formulario" />
+<input id="form-slug" placeholder="slug-del-formulario" />
+<button onclick="createForm()">Crear</button>
+
+<hr>
+
+<h3>Mis formularios</h3>
+<ul id="forms"></ul>
+
+<hr>
+
+<h3>Campos del formulario</h3>
+<div id="fields">Selecciona un formulario</div>
+
+<hr>
+
+<h3>Agregar campo</h3>
+<select id="field-type">
+  <option value="text">Texto</option>
+  <option value="email">Email</option>
+  <option value="phone">Teléfono</option>
+  <option value="number">Número</option>
+</select>
+
+<input id="field-label" placeholder="Etiqueta del campo" />
+<label>
+  <input type="checkbox" id="field-required" /> Requerido
+</label>
+<button onclick="addField()">Agregar campo</button>
+
+<hr>
+
+<div id="branding"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
+

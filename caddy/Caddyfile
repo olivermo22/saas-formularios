@@ -1,0 +1,40 @@
+{
+  email admin@iawhats.com.mx
+}
+
+iawhats.com.mx {
+  encode gzip
+  reverse_proxy frontend:80
+}
+
+api.iawhats.com.mx {
+
+  @preflight {
+    method OPTIONS
+  }
+
+  handle @preflight {
+    header {
+      Access-Control-Allow-Origin "https://iawhats.com.mx"
+      Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+      Access-Control-Allow-Headers "Content-Type, Authorization"
+      Access-Control-Max-Age "86400"
+    }
+    respond "" 204
+  }
+
+  handle {
+    reverse_proxy backend:8080 {
+      header_up Host {host}
+      header_up X-Real-IP {remote_host}
+      header_up X-Forwarded-For {remote_host}
+      header_up X-Forwarded-Proto {scheme}
+    }
+
+    header {
+      Access-Control-Allow-Origin "https://iawhats.com.mx"
+      Access-Control-Allow-Credentials true
+    }
+  }
+}
+

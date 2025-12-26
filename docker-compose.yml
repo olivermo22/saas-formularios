@@ -1,0 +1,38 @@
+services:
+  caddy:
+    image: caddy:2.8-alpine
+    container_name: iawhats-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+      - backend
+
+  frontend:
+    image: nginx:alpine
+    container_name: iawhats-frontend
+    restart: unless-stopped
+    volumes:
+      - ./frontend/html:/usr/share/nginx/html:ro
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: iawhats-backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    expose:
+      - "8080"
+
+volumes:
+  caddy_data:
+  caddy_config:
+
