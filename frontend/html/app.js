@@ -2,6 +2,7 @@ const API = "https://api.iawhats.com.mx/v1";
 const token = localStorage.getItem("token");
 
 let currentFormId = null;
+let currentFields = [];
 
 if (!token) {
   window.location.href = "/";
@@ -80,7 +81,7 @@ async function loadForms() {
 // ---------- SELECT FORM ----------
 async function selectForm(formId) {
   currentFormId = formId;
-  loadFields();
+  await loadFields();
 }
 
 // ---------- LOAD FIELDS ----------
@@ -91,19 +92,82 @@ async function loadFields() {
     headers: { Authorization: `Bearer ${token}` }
   }).then(r => r.json());
 
+  currentFields = res.fields || [];
+
+  renderFields();
+}
+
+// ---------- RENDER FIELDS ----------
+function renderFields() {
   const container = document.getElementById("fields");
   container.innerHTML = "";
 
-  if (!res.fields.length) {
-    container.innerHTML = "Sin campos aún.";
+  if (!currentFields.length) {
+    container.innerText = "Sin campos aún.";
     return;
   }
 
-  res.fields.forEach(f => {
+  currentFields.forEach((f, index) => {
     const div = document.createElement("div");
-    div.innerText = `${f.position}. ${f.label} (${f.type}) ${f.required ? "*" : ""}`;
+    div.style.marginBottom = "6px";
+
+    div.innerHTML = `
+      <b>${index + 1}.</b> ${f.label} (${f.type}) ${f.required ? "*" : ""}
+      <button onclick="moveField(${index}, -1)">↑</button>
+      <button onclick="moveField(${index}, 1)">↓</button>
+      <button onclick="deleteField('${f.id}')">🗑</button>
+    `;
+
     container.appendChild(div);
   });
+}
+
+// ---------- MOVE FIELD ----------
+async function moveField(index, direction) {
+  const newIndex = index + direction;
+
+  if (newIndex < 0 || newIndex >= currentFields.length) return;
+
+  // Swap local array
+  const temp = currentFields[index];
+  currentFields[index] = currentFields[newIndex];
+  currentFields[newIndex] = temp;
+
+  renderFields();
+
+  // Persist order
+  await persistOrder();
+}
+
+// ---------- PERSIST ORDER ----------
+async function persistOrder() {
+  const orderedIds = currentFields.map(f => f.id);
+
+  await fetch(`${API}/forms/${currentFormId}/fields/order`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      orderedFieldIds: orderedIds
+    })
+  });
+}
+
+// ---------- DELETE FIELD ----------
+async function deleteField(fieldId) {
+  if (!confirm("¿Eliminar este campo?")) return;
+
+  await fetch(`${API}/forms/${currentFormId}/fields/${fieldId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  currentFields = currentFields.filter(f => f.id !== fieldId);
+  renderFields();
 }
 
 // ---------- ADD FIELD ----------
@@ -131,7 +195,7 @@ async function addField() {
     body: JSON.stringify({
       type,
       label,
-      required,
+      required
     })
   });
 

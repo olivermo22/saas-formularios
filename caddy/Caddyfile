@@ -8,11 +8,31 @@ iawhats.com.mx {
 }
 
 api.iawhats.com.mx {
-  reverse_proxy backend:8080 {
-    header_up Host {host}
-    header_up X-Real-IP {remote_host}
-    header_up X-Forwarded-For {remote_host}
-    header_up X-Forwarded-Proto {scheme}
+
+  @options {
+    method OPTIONS
+  }
+
+  handle @options {
+    header Access-Control-Allow-Origin "https://iawhats.com.mx"
+    header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    header Access-Control-Allow-Headers "Authorization, Content-Type"
+    header Access-Control-Allow-Credentials "true"
+    respond "" 204
+  }
+
+  handle {
+    reverse_proxy backend:8080 {
+      header_up Host {host}
+      header_up X-Real-IP {remote_host}
+      header_up X-Forwarded-For {remote_host}
+      header_up X-Forwarded-Proto {scheme}
+    }
+
+    header Access-Control-Allow-Origin "https://iawhats.com.mx"
+    header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    header Access-Control-Allow-Headers "Authorization, Content-Type"
+    header Access-Control-Allow-Credentials "true"
   }
 }
 
